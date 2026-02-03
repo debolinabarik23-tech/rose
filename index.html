@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rose Day | Choose a Rose, Unlock a Feeling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cookie&family=Dancing+Script:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #fff0f5 0%, #f8f8ff 50%, #fffaf0 100%);
+            color: #7a3b5c;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating Petals */
+        .petal {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+            border-radius: 50% 50% 50% 0;
+            opacity: 0.6;
+            z-index: 1;
+            pointer-events: none;
+            filter: blur(1px);
+            transform-origin: center;
+        }
+
+        /* Sparkles */
+        .sparkle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background-color: #fffacd;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 3px #fffacd;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,182,193,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .main-title {
+            font-family: 'Cookie', cursive;
+            font-size: 5.5rem;
+            color: #d32f75;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+            text-shadow: 3px 3px 15px rgba(211, 47, 117, 0.3);
+        }
+
+        .sub-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #ff69b4;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        .heartbeat {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            color: #7a3b5c;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #d32f75;
+            margin-top: 20px;
+        }
+
+        .signature .name {
+            display: inline-block;
+            padding: 5px 20px;
+            background: linear-gradient(45deg, #ffb6c1, #ff69b4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+
+        /* Rose Garden */
+        .rose-garden {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 40px;
+            margin: 60px 0;
+            padding: 40px;
+            position: relative;
+        }
+
+        @media (max-width: 1200px) {
+            .rose-garden {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .rose-garden {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+        }
+
+        .rose-card {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .rose-container {
+            position: relative;
+            width: 180px;
+            height: 220px;
+            margin: 0 auto;
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.15));
+            animation: float 5s ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        /* Rose Colors */
+        .red-rose { --rose-color: #ff0066; --light-color: #ff66a3; --glow-color: rgba(255, 0, 102, 0.5); }
+        .pink-rose { --rose-color: #ffb6c1; --light-color: #ffdce4; --glow-color: rgba(255, 182, 193, 0.5); }
+        .white-rose { --rose-color: #ffffff; --light-color: #fffafa; --glow-color: rgba(255, 255, 255, 0.5); }
+        .yellow-rose { --rose-color: #ffdd44; --light-color: #ffeb99; --glow-color: rgba(255, 221, 68, 0.5); }
+        .blue-rose { --rose-color: #6699ff; --light-color: #a3c2ff; --glow-color: rgba(102, 153, 255, 0.5); }
+        .purple-rose { --rose-color: #b366ff; --light-color: #d9b3ff; --glow-color: rgba(179, 102, 255, 0.5); }
+        .black-rose { --rose-color: #4d004d; --light-color: #800080; --glow-color: rgba(77, 0, 77, 0.5); }
+        .orange-rose { --rose-color: #ff9933; --light-color: #ffcc80; --glow-color: rgba(255, 153, 51, 0.5); }
+        .peach-rose { --rose-color: #ffcc99; --light-color: #ffe6cc; --glow-color: rgba(255, 204, 153, 0.5); }
+        .lavender-rose { --rose-color: #cc99ff; --light-color: #e6ccff; --glow-color: rgba(204, 153, 255, 0.5); }
+
+        /* Rose Petals Structure */
+        .rose-petals {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: bottom center;
+        }
+
+        .petal-layer {
+            position: absolute;
+            border-radius: 50% 50% 40% 40%;
+            background: radial-gradient(circle at 35% 35%, var(--light-color), var(--rose-color) 70%);
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .layer-1 { width: 95%; height: 95%; top: 5%; left: 2.5%; transform: rotate(0deg); }
+        .layer-2 { width: 90%; height: 90%; top: 10%; left: 5%; transform: rotate(45deg); }
+        .layer-3 { width: 85%; height: 85%; top: 15%; left: 7.5%; transform: rotate(90deg); }
+        .layer-4 { width: 80%; height: 80%; top: 20%; left: 10%; transform: rotate(135deg); }
+
+        .rose-stem {
+            position: absolute;
+            width: 10px;
+            height: 120px;
+            background: linear-gradient(to right, #2d7d2d, #4caf50);
+            top: 200px;
+            left: 85px;
+            border-radius: 5px;
+            box-shadow: 2px 0 8px rgba(0, 100, 0, 0.3);
+        }
+
+        .rose-leaf {
+            position: absolute;
+            width: 30px;
+            height: 25px;
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+            border-radius: 50% 0 50% 50%;
+            top: 170px;
+            left: 100px;
+            transform: rotate(-45deg);
+        }
+
+        .rose-leaf::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2));
+            border-radius: 50% 0 50% 50%;
+        }
+
+        .rose-name {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            color: #7a3b5c;
+            margin-top: 25px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .rose-card:hover .rose-container {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 30px var(--glow-color));
+        }
+
+        .rose-card:hover .rose-name {
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--rose-color);
+            transform: translateY(-5px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ff69b4, transparent);
+        }
+
+        .footer-message {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #d32f75;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        .footer-love {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: #7a3b5c;
+            margin-top: 30px;
+        }
+
+        .footer-names {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-name {
+            font-family: 'Cookie', cursive;
+            font-size: 3.5rem;
+            color: #ff69b4;
+            text-shadow: 2px 2px 8px rgba(255, 105, 180, 0.3);
+        }
+
+        .footer-heart {
+            font-size: 3rem;
+            color: #ff0066;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        /* Rose Experience Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 240, 245, 0.98);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(211, 47, 117, 0.2);
+            overflow: hidden;
+            position: relative;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-family: 'Cookie', cursive;
+            font-size: 4.5rem;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #fff;
+            opacity: 0.9;
+        }
+
+        .modal-body {
+            padding: 40px;
+        }
+
+        .modal-section {
+            margin-bottom: 40px;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin: 0 auto 30px;
+            display: block;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border: 8px solid white;
+        }
+
+        .modal-section h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #d32f75;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-section p {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            color: #7a3b5c;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .secret-button {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #ff69b4, #d32f75);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(211, 47, 117, 0.3);
+        }
+
+        .secret-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(211, 47, 117, 0.4);
+        }
+
+        .secret-note {
+            background: linear-gradient(135deg, #fff0f5, #f8f8ff);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            border: 2px dashed #ff69b4;
+            display: none;
+        }
+
+        .secret-note.active {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .song-section {
+            background: linear-gradient(135deg, #f0f8ff, #fff0f5);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+        }
+
+        .song-section h3 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8rem;
+            color: #6699ff;
+            margin-bottom: 15px;
+        }
+
+        .lyrics {
+            font-style: italic;
+            font-size: 1.3rem;
+            color: #7a3b5c;
+            text-align: center;
+            padding: 20px;
+            border-left: 4px solid #ff69b4;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .modal-footer {
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #fffaf0, #f8f8ff);
+            border-top: 1px solid #ffb6c1;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #ffb6c1, #ff69b4);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
+        }
+
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 105, 180, 0.4);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(3deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Audio Player */
+        .audio-player {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title { font-size: 3.5rem; }
+            .sub-title { font-size: 2.2rem; }
+            .heartbeat { font-size: 1.8rem; }
+            .signature { font-size: 2rem; }
+            .rose-container { width: 140px; height: 180px; }
+            .rose-stem { height: 100px; top: 160px; left: 65px; }
+            .rose-leaf { top: 140px; left: 80px; }
+            .rose-name { font-size: 1.8rem; }
+            .footer-message { font-size: 2.2rem; }
+            .footer-name { font-size: 2.8rem; }
+            .modal-title { font-size: 3.5rem; }
+            .modal-subtitle { font-size: 2.2rem; }
+        }
+
+        /* Cursor */
+        body {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath fill='%23ff69b4' d='M12 2C7.03 2 3 6.03 3 11c0 1.5.4 3 1.1 4.3L2 24l8.7-2.1c1.3.7 2.8 1.1 4.3 1.1 4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-.83 0-1.5-.67-1.5-1.5S11.17 15 12 15s1.5.67 1.5 1.5S12.83 18 12 18zm4-6c-.83 0-1.5-.67-1.5-1.5S15.17 9 16 9s1.5.67 1.5 1.5S16.83 12 16 12zm-8 0c-.83 0-1.5-.67-1.5-1.5S7.17 9 8 9s1.5.67 1.5 1.5S8.83 12 8 12z'/%3E%3C/svg%3E") 16 16, auto;
+        }
+
+        .rose-card {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath fill='%23ff0066' d='M16 3c-4.97 0-9 4.03-9 9 0 1.5.4 3 1.1 4.3L7 24l7.7-1.9c1.3.7 2.8 1.1 4.3 1.1 4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-.83 0-1.5-.67-1.5-1.5S15.17 16 16 16s1.5.67 1.5 1.5S16.83 19 16 19zm4-8c-.83 0-1.5-.67-1.5-1.5S19.17 8 20 8s1.5.67 1.5 1.5S20.83 11 20 11zm-8 0c-.83 0-1.5-.67-1.5-1.5S11.17 8 12 8s1.5.67 1.5 1.5S12.83 11 12 11z'/%3E%3C/svg%3E") 16 16, pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Petals -->
+    <div id="petals-container"></div>
+    
+    <!-- Sparkles -->
+    <div id="sparkles-container"></div>
+
+    <!-- Audio Player -->
+    <audio id="background-music" class="audio-player" loop></audio>
+
+    <!-- Main Garden -->
+    <div class="container">
+        <header class="header">
+            <h1 class="main-title">Choose a Rose, Unlock a Feeling</h1>
+            <h2 class="sub-title">Happy Rose Day</h2>
+            <p class="heartbeat">Each rose holds a piece of my heart... choose slowly.</p>
+            <div class="signature">
+                <span class="name">Debolina</span> 
+                <i class="fas fa-heart" style="color:#ff0066; margin:0 15px;"></i> 
+                <span class="name">Jay</span>
+            </div>
+        </header>
+
+        <!-- Rose Garden -->
+        <div class="rose-garden" id="rose-garden">
+            <!-- Roses will be inserted by JavaScript -->
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer-message">Happy Rose Day 💕 Choose any rose, you'll always find my heart inside it.</p>
+            <div class="footer-names">
+                <span class="footer-name">Debolina</span>
+                <span class="footer-heart">❤️</span>
+                <span class="footer-name">Jay</span>
+            </div>
+            <p class="footer-love">Made with eternal love by Debolina for Jay</p>
+        </footer>
+    </div>
+
+    <!-- Rose Experience Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content" id="modal-content">
+            <!-- Modal content will be inserted by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Rose Data - MODIFY THIS SECTION WITH YOUR FILES
+        const roses = [
+            {
+                id: 'red',
+                name: 'Red Rose',
+                colorClass: 'red-rose',
+                title: 'Red Rose',
+                subtitle: 'Passionate Love',
+                image: 'red.jpg', // Your image file
+                audio: 'red.mp3', // Your audio file
+                description: 'This red rose represents my deepest passion and eternal love for you.',
+                secret: 'Every time I see you, my heart races like it did on the first day.',
+                lyric: 'And I will always love you, forever and always.',
+                songTitle: '"Perfect" by Ed Sheeran'
+            },
+            {
+                id: 'pink',
+                name: 'Pink Rose',
+                colorClass: 'pink-rose',
+                title: 'Pink Rose',
+                subtitle: 'Sweet Admiration',
+                image: 'pink.jpg',
+                audio: 'pink.mp3',
+                description: 'This pink rose symbolizes my admiration and sweet affection for you.',
+                secret: 'Your smile is the most beautiful thing I see every day.',
+                lyric: 'You are the love of my life, my everything.',
+                songTitle: '"A Thousand Years" by Christina Perri'
+            },
+            {
+                id: 'white',
+                name: 'White Rose',
+                colorClass: 'white-rose',
+                title: 'White Rose',
+                subtitle: 'Pure Devotion',
+                image: 'white.jpg',
+                audio: 'white.mp3',
+                description: 'This white rose represents the purity and sincerity of my love.',
+                secret: 'My love for you is as pure as this white rose.',
+                lyric: 'Pure as the driven snow, is my love for you.',
+                songTitle: '"Pure Love" by Unknown'
+            },
+            {
+                id: 'yellow',
+                name: 'Yellow Rose',
+                colorClass: 'yellow-rose',
+                title: 'Yellow Rose',
+                subtitle: 'Our Fun, Silly Moments',
+                image: 'yellow.jpg',
+                audio: 'yellow.mp3',
+                description: 'The random jokes. The stupid laughs. The moments that don\'t make sense to anyone else. This rose celebrates us being us.',
+                secret: 'Remember when we couldn\'t stop laughing for no reason? That\'s my favorite memory.',
+                lyric: 'Because I\'m happy... Clap along if you feel like happiness is the truth.',
+                songTitle: '"Happy" by Pharrell Williams'
+            },
+            {
+                id: 'blue',
+                name: 'Blue Rose',
+                colorClass: 'blue-rose',
+                title: 'Blue Rose',
+                subtitle: 'Mysterious Connection',
+                image: 'blue.jpg',
+                audio: 'blue.mp3',
+                description: 'This rare blue rose represents our unique and mysterious connection.',
+                secret: 'Sometimes I feel like we can understand each other without words.',
+                lyric: 'Lost in your blue eyes, found my home.',
+                songTitle: '"Blue" by Eiffel 65'
+            },
+            {
+                id: 'purple',
+                name: 'Purple Rose',
+                colorClass: 'purple-rose',
+                title: 'Purple Rose',
+                subtitle: 'Enchantment',
+                image: 'purple.jpg',
+                audio: 'purple.mp3',
+                description: 'This purple rose symbolizes the enchantment you bring to my life.',
+                secret: 'You make every ordinary moment feel magical.',
+                lyric: 'You put a spell on me, and I\'m under your enchantment.',
+                songTitle: '"Enchanted" by Taylor Swift'
+            },
+            {
+                id: 'black',
+                name: 'Black Rose',
+                colorClass: 'black-rose',
+                title: 'Black Rose',
+                subtitle: 'Eternal Devotion',
+                image: 'black.jpg',
+                audio: 'black.mp3',
+                description: 'This black rose represents my eternal devotion and commitment to you.',
+                secret: 'Through all darkness, my love for you shines bright.',
+                lyric: 'Forever and always, till the end of time.',
+                songTitle: '"Always" by Bon Jovi'
+            },
+            {
+                id: 'orange',
+                name: 'Orange Rose',
+                colorClass: 'orange-rose',
+                title: 'Orange Rose',
+                subtitle: 'Fiery Passion',
+                image: 'orange.jpg',
+                audio: 'orange.mp3',
+                description: 'This orange rose symbolizes the fiery passion and energy in our relationship.',
+                secret: 'Every kiss feels like the first time.',
+                lyric: 'This fire between us will never die.',
+                songTitle: '"Fire" by The Pointer Sisters'
+            },
+            {
+                id: 'peach',
+                name: 'Peach Rose',
+                colorClass: 'peach-rose',
+                title: 'Peach Rose',
+                subtitle: 'Genuine Gratitude',
+                image: 'peach.jpg',
+                audio: 'peach.mp3',
+                description: 'This peach rose represents my sincere gratitude for having you in my life.',
+                secret: 'Thank you for being exactly who you are.',
+                lyric: 'Thank you for loving me, for being my eyes.',
+                songTitle: '"Thank You" by Dido'
+            },
+            {
+                id: 'lavender',
+                name: 'Lavender Rose',
+                colorClass: 'lavender-rose',
+                title: 'Lavender Rose',
+                subtitle: 'Love at First Sight',
+                image: 'lavender.jpg',
+                audio: 'lavender.mp3',
+                description: 'This lavender rose represents that magical moment when I first saw you.',
+                secret: 'From the moment I saw you, I knew my life would never be the same.',
+                lyric: 'Love at first sight, I felt it from the start.',
+                songTitle: '"Love at First Sight" by Kylie Minogue'
+            }
+        ];
+
+        // DOM Elements
+        const roseGarden = document.getElementById('rose-garden');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContent = document.getElementById('modal-content');
+        const audioPlayer = document.getElementById('background-music');
+        const petalsContainer = document.getElementById('petals-container');
+        const sparklesContainer = document.getElementById('sparkles-container');
+
+        // Create Floating Petals
+        function createPetals() {
+            for (let i = 0; i < 35; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.style.left = `${Math.random() * 100}vw`;
+                petal.style.top = `${Math.random() * 100}vh`;
+                petal.style.animation = `float ${8 + Math.random() * 10}s ease-in-out infinite`;
+                petal.style.animationDelay = `${Math.random() * 10}s`;
+                petal.style.opacity = `${0.3 + Math.random() * 0.4}`;
+                petal.style.transform = `rotate(${Math.random() * 360}deg) scale(${0.5 + Math.random() * 0.5})`;
+                petalsContainer.appendChild(petal);
+            }
+        }
+
+        // Create Sparkles
+        function createSparkles() {
+            for (let i = 0; i < 25; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = `${Math.random() * 100}vw`;
+                sparkle.style.top = `${Math.random() * 100}vh`;
+                sparkle.style.animation = `sparkle ${2 + Math.random() * 3}s ease-in-out infinite`;
+                sparkle.style.animationDelay = `${Math.random() * 5}s`;
+                sparklesContainer.appendChild(sparkle);
+            }
+        }
+
+        // Create Roses in Garden
+        function createRoses() {
+            roses.forEach((rose, index) => {
+                const roseCard = document.createElement('div');
+                roseCard.className = 'rose-card';
+                roseCard.dataset.roseId = rose.id;
+                roseCard.style.setProperty('--delay', `${index * 0.3}s`);
+
+                roseCard.innerHTML = `
+                    <div class="rose-container ${rose.colorClass}">
+                        <div class="rose-petals">
+                            <div class="petal-layer layer-1"></div>
+                            <div class="petal-layer layer-2"></div>
+                            <div class="petal-layer layer-3"></div>
+                            <div class="petal-layer layer-4"></div>
+                        </div>
+                        <div class="rose-stem"></div>
+                        <div class="rose-leaf"></div>
+                    </div>
+                    <div class="rose-name">${rose.name}</div>
+                `;
+
+                roseCard.addEventListener('click', () => openRoseModal(rose));
+                roseGarden.appendChild(roseCard);
+            });
+        }
+
+        // Open Rose Modal
+        function openRoseModal(rose) {
+            // Stop any playing audio first
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            
+            // Set audio source
+            audioPlayer.src = rose.audio;
+            
+            // Create modal content
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <h1 class="modal-title">${rose.title}</h1>
+                    <p class="modal-subtitle">${rose.subtitle}</p>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <img class="modal-image" src="${rose.image}" alt="${rose.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNGRkZGRkYiLz48dGV4dCB4PSIyMDAiIHk9IjE1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiBmaWxsPSIjRkY2NkEzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5Zb3VyIFJvbWFudGljIEltYWdlIEhlcmU8L3RleHQ+PC9zdmc+'">
+                        <p>${rose.description}</p>
+                        <button class="secret-button" onclick="revealSecret()">
+                            <i class="fas fa-heart"></i> Click for a secret note
+                        </button>
+                        <div class="secret-note" id="secret-note">
+                            <h3><i class="fas fa-lock"></i> Secret Note for You</h3>
+                            <p>${rose.secret}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="song-section">
+                        <h3>Song for this rose: ${rose.songTitle}</h3>
+                        <div class="lyrics">
+                            "${rose.lyric}"
+                        </div>
+                        <p><i>Note: Place your MP3 file named "${rose.audio}" in the same folder as this HTML file.</i></p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h2>A little visual for our feeling</h2>
+                        <p>This rose represents a special memory we share together. Every time you see it, remember how much you mean to me.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="back-button" onclick="closeRoseModal()">
+                        <i class="fas fa-arrow-left"></i> Back to Rose Garden
+                    </button>
+                </div>
+            `;
+
+            // Show modal with animation
+            modalOverlay.style.display = 'block';
+            setTimeout(() => {
+                modalOverlay.style.opacity = '1';
+                modalContent.style.opacity = '1';
+                modalContent.style.transform = 'translateY(0)';
+                
+                // Try to play audio
+                const playPromise = audioPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log('Audio autoplay prevented:', error);
+                        // User interaction is needed to play audio
+                        modalOverlay.addEventListener('click', playAudioOnInteraction, { once: true });
+                    });
+                }
+            }, 10);
+        }
+
+        // Function to play audio on user interaction
+        function playAudioOnInteraction() {
+            audioPlayer.play().catch(console.error);
+        }
+
+        // Reveal secret note
+        window.revealSecret = function() {
+            const secretNote = document.getElementById('secret-note');
+            secretNote.classList.add('active');
+            
+            // Add confetti effect
+            createConfetti();
+        };
+
+        // Create confetti effect
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'petal';
+                confetti.style.position = 'absolute';
+                confetti.style.width = '15px';
+                confetti.style.height = '15px';
+                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                confetti.style.left = `${50 + Math.random() * 20}%`;
+                confetti.style.top = '50%';
+                confetti.style.zIndex = '1001';
+                confetti.style.borderRadius = '50%';
+                confetti.style.animation = `confettiFall ${1 + Math.random() * 2}s ease-out forwards`;
+                
+                document.querySelector('.modal-content').appendChild(confetti);
+                
+                // Remove after animation
+                setTimeout(() => confetti.remove(), 2000);
+            }
+            
+            // Add CSS for confetti animation
+            if (!document.querySelector('#confetti-style')) {
+                const style = document.createElement('style');
+                style.id = 'confetti-style';
+                style.textContent = `
+                    @keyframes confettiFall {
+                        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                        100% { transform: translateY(500px) rotate(${360 + Math.random() * 360}deg); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Close Rose Modal
+        window.closeRoseModal = function() {
+            modalOverlay.style.opacity = '0';
+            modalContent.style.opacity = '0';
+            modalContent.style.transform = 'translateY(50px)';
+            
+            // Stop audio
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            
+            setTimeout(() => {
+                modalOverlay.style.display = 'none';
+            }, 800);
+        };
+
+        // Close modal when clicking outside content
+        modalOverlay.addEventListener('click', function(event) {
+            if (event.target === modalOverlay) {
+                closeRoseModal();
+            }
+        });
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createPetals();
+            createSparkles();
+            createRoses();
+            
+            // Add floating animation to petals
+            setInterval(() => {
+                const petals = document.querySelectorAll('.petal');
+                petals.forEach(petal => {
+                    if (petal.parentElement === petalsContainer) {
+                        let x = parseFloat(petal.style.left);
+                        let y = parseFloat(petal.style.top);
+                        
+                        x += (Math.random() - 0.5) * 0.3;
+                        y += 0.2;
+                        
+                        if (x > 100) x = 0;
+                        if (x < 0) x = 100;
+                        if (y > 100) y = 0;
+                        
+                        petal.style.left = `${x}vw`;
+                        petal.style.top = `${y}vh`;
+                    }
+                });
+            }, 100);
+            
+            // Add sparkle animation
+            setInterval(() => {
+                const sparkles = document.querySelectorAll('.sparkle');
+                sparkles.forEach(sparkle => {
+                    sparkle.style.left = `${Math.random() * 100}vw`;
+                    sparkle.style.top = `${Math.random() * 100}vh`;
+                });
+            }, 3000);
+        });
+
+        // Fallback for missing images
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'IMG') {
+                e.target.style.border = '3px dashed #ffb6c1';
+                e.target.style.padding = '20px';
+            }
+        }, true);
+    </script>
+</body>
+</html>
